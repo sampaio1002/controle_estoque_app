@@ -1,6 +1,3 @@
-// lib/models/usuario.dart
-
-// Classe POO simples que representa o usuário do sistema.
 class Usuario {
   final String id;
   final String email;

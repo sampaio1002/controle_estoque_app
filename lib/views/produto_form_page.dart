@@ -1,12 +1,10 @@
-// lib/views/produto_form_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:controle_estoque_app/viewmodels/produto_viewmodel.dart';
 import 'package:controle_estoque_app/models/produto.dart';
 
 class ProdutoFormPage extends StatefulWidget {
-  // Se for null, é Cadastro; se tiver valor, é Edição.
+  
   final Produto? produto; 
   
   const ProdutoFormPage({super.key, this.produto});
@@ -18,7 +16,6 @@ class ProdutoFormPage extends StatefulWidget {
 class _ProdutoFormPageState extends State<ProdutoFormPage> {
   final _formKey = GlobalKey<FormState>();
   
-  // Controllers para Tratamento de Erros e Validação de Entradas
   late final TextEditingController _nomeController;
   late final TextEditingController _descricaoController;
   late final TextEditingController _precoController;
@@ -30,7 +27,7 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
   @override
   void initState() {
     super.initState();
-    // Inicializa os controladores com os valores do produto (se estiver editando)
+    
     _nomeController = TextEditingController(text: widget.produto?.nome ?? '');
     _descricaoController = TextEditingController(text: widget.produto?.descricao ?? '');
     _precoController = TextEditingController(text: widget.produto?.precoVenda.toString() ?? '');
@@ -48,11 +45,8 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
     super.dispose();
   }
   
-  // --------------------------------------------------------------------------
-  // Lógica CRUD (Cadastro/Edição)
-  // --------------------------------------------------------------------------
   void _salvarProduto() async {
-    // Requisito: Tratamento de erros e validação de entradas
+    
     if (!_formKey.currentState!.validate()) return;
     
     final viewModel = Provider.of<ProdutoViewModel>(context, listen: false);
@@ -60,14 +54,13 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
     final novoOuAtualizadoProduto = Produto(
       nome: _nomeController.text,
       descricao: _descricaoController.text,
-      // Validação de Entradas: Converte texto para double/int
       precoVenda: double.tryParse(_precoController.text) ?? 0.0,
       quantidadeEstoque: int.tryParse(_quantidadeController.text) ?? 0,
       estoqueMinimo: int.tryParse(_minimoController.text) ?? 0,
     );
 
     if (isEditing) {
-      // Atualiza o objeto existente com os novos valores
+      
       widget.produto!.nome = novoOuAtualizadoProduto.nome;
       widget.produto!.descricao = novoOuAtualizadoProduto.descricao;
       widget.produto!.precoVenda = novoOuAtualizadoProduto.precoVenda;
@@ -86,11 +79,11 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
     }
   }
 
-  // Lógica CRUD (Exclusão)
+  
   void _excluirProduto() async {
     final viewModel = Provider.of<ProdutoViewModel>(context, listen: false);
     
-    // Confirmação antes de excluir (Boa Prática de Desenvolvimento Mobile)
+    
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -107,14 +100,12 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
       await viewModel.excluirProduto(widget.produto!);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Produto excluído!')));
       if (mounted) {
-        Navigator.of(context).pop(); // Volta para a lista
+        Navigator.of(context).pop(); 
       }
     }
   }
 
-  // --------------------------------------------------------------------------
-  // UI (Interface Responsiva)
-  // --------------------------------------------------------------------------
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +113,7 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
         title: Text(isEditing ? 'Editar Produto' : 'Cadastrar Produto'),
         backgroundColor: Colors.teal,
         actions: [
-          // Botão de Excluir, visível apenas no modo Edição
+          
           if (isEditing)
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.white),
@@ -136,44 +127,44 @@ class _ProdutoFormPageState extends State<ProdutoFormPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
-              // Campo Nome
+              
               TextFormField(
                 controller: _nomeController,
                 decoration: const InputDecoration(labelText: 'Nome do Produto'),
                 validator: (value) => value == null || value.isEmpty ? 'O nome é obrigatório.' : null,
               ),
-              // Campo Descrição
+              
               TextFormField(
                 controller: _descricaoController,
                 decoration: const InputDecoration(labelText: 'Descrição'),
               ),
-              // Campo Preço
+              
               TextFormField(
                 controller: _precoController,
                 decoration: const InputDecoration(labelText: 'Preço de Venda (R\$)'),
                 keyboardType: TextInputType.number,
-                // Validação de Entradas: verifica se é um número
+                
                 validator: (value) => double.tryParse(value ?? '') == null ? 'Insira um preço válido.' : null,
               ),
-              // Campo Quantidade em Estoque
+              
               TextFormField(
                 controller: _quantidadeController,
                 decoration: const InputDecoration(labelText: 'Quantidade em Estoque'),
                 keyboardType: TextInputType.number,
-                 // Validação de Entradas: verifica se é um número inteiro
+                 
                 validator: (value) => int.tryParse(value ?? '') == null ? 'Insira uma quantidade inteira.' : null,
               ),
-              // Campo Estoque Mínimo (Alerta)
+              
               TextFormField(
                 controller: _minimoController,
                 decoration: const InputDecoration(labelText: 'Estoque Mínimo para Alerta'),
                 keyboardType: TextInputType.number,
-                 // Validação de Entradas: verifica se é um número inteiro
+                 
                 validator: (value) => int.tryParse(value ?? '') == null ? 'Insira uma quantidade inteira.' : null,
               ),
               const SizedBox(height: 30),
               
-              // Botão Salvar
+              
               ElevatedButton.icon(
                 onPressed: _salvarProduto,
                 icon: Icon(Icons.save),

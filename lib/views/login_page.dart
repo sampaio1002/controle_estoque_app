@@ -1,9 +1,7 @@
-// lib/views/login_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:controle_estoque_app/viewmodels/auth_viewmodel.dart';
-import 'package:controle_estoque_app/views/home_page.dart'; // Importa a HomePage
+import 'package:controle_estoque_app/views/home_page.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,18 +28,17 @@ class _LoginPageState extends State<LoginPage> {
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     
-    // 1. Inicia o Carregamento
+    
     setState(() { _isLoading = true; });
 
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    bool sucesso = false; // Inicializa a variável sucesso
+    bool sucesso = false; 
     String? nome;
 
     try {
-      // Limpa qualquer erro antigo do ViewModel antes de tentar
-      authViewModel.clearError(); // Assumindo que você adicionará clearError no AuthViewModel
+      
+      authViewModel.clearError(); 
 
-      // 2. Tenta Login ou Cadastro
       if (_isLogin) {
         sucesso = await authViewModel.login(_emailController.text, _senhaController.text);
       } else {
@@ -49,26 +46,26 @@ class _LoginPageState extends State<LoginPage> {
         sucesso = await authViewModel.cadastrar(nome, _emailController.text, _senhaController.text);
       }
 
-      // 3. Verifica o Resultado e Navega
+      
       if (sucesso && mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else if (mounted && authViewModel.errorMessage != null) {
-        // Mostra SnackBar com mensagem de erro do ViewModel
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(authViewModel.errorMessage!)),
         );
       }
     } catch (e) {
-      // 4. Captura Exceções Inesperadas (Garantia de Tratamento de Erro)
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro inesperado: ${e.toString()}')),
         );
       }
     } finally {
-      // 5. GARANTE que o Carregamento Termine (OTIMIZAÇÃO)
+      
       if (mounted) {
         setState(() { _isLoading = false; });
       }
