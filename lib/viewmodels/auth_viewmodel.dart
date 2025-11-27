@@ -6,7 +6,6 @@ class AuthViewModel with ChangeNotifier {
   
   final AuthService _authService = AuthService();
   
-  
   Usuario? _usuarioLogado;
 
   
@@ -31,7 +30,12 @@ class AuthViewModel with ChangeNotifier {
       notifyListeners();
       return usuario != null;
     } catch (e) {
-      _errorMessage = 'Erro de Login: Usuário ou senha inválidos.';
+      
+      if (e.toString().contains('Credenciais inválidas')) {
+          _errorMessage = 'Usuário ou senha inválidos.';
+      } else {
+          _errorMessage = 'Erro de Login inesperado.';
+      }
       notifyListeners();
       return false;
     }
@@ -41,9 +45,14 @@ class AuthViewModel with ChangeNotifier {
     try {
       _errorMessage = null;
       await _authService.cadastrar(nome, email, senha);
+      
+      
       return await login(email, senha);
     } catch (e) {
-      _errorMessage = 'Erro ao cadastrar: ${e.toString()}';
+      
+      _errorMessage = e.toString().contains('já está cadastrado') 
+                      ? 'Este e-mail já está cadastrado.'
+                      : 'Erro desconhecido ao cadastrar.';
       notifyListeners();
       return false;
     }

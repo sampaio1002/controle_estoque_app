@@ -2,6 +2,7 @@ import 'package:controle_estoque_app/models/usuario.dart';
 
 class AuthService {
   
+  
   final List<Usuario> _usuariosMock = [
     Usuario(id: '1', email: 'teste@app.com', nome: 'Usuário Padrão')
   ];
@@ -9,24 +10,21 @@ class AuthService {
   
   Future<Usuario?> login(String email, String senha) async {
     
-    if (email == 'teste@app.com' && senha == '123') {
-      return _usuariosMock.first;
-    }
+    final user = _usuariosMock.cast<Usuario?>().firstWhere(
+      (u) => u?.email == email,
+      orElse: () => null, 
+    );
 
-    try {
-      final user = _usuariosMock.firstWhere((u) => u.email == email);
-      
-      
-      if (senha == '123') {
-        return user;
-      }
-    } catch (_) {
-      throw Exception('Usuário não encontrado.');
+    
+    if (user != null && senha == '123') {
+        return user; 
     }
     
-    return null; 
+    
+    throw Exception('Credenciais inválidas.'); 
   }
 
+  
   Future<Usuario> cadastrar(String nome, String email, String senha) async {
     
     if (_usuariosMock.any((u) => u.email == email)) {
@@ -39,6 +37,8 @@ class AuthService {
       email: email, 
       nome: nome
     );
+    
+    
     _usuariosMock.add(novoUsuario);
 
     return novoUsuario;
